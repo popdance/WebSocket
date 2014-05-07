@@ -24,11 +24,11 @@ xgate 님의 블로그 : http://cmohgate.tistory.com/10
 
 - Install Nodejs Lastest Verion
 
-> http://nodejs.org/download/)
+> http://nodejs.org/download/
 
 - Install Python Version 2.7.6 
 
-> https://www.python.org/ftp/python/2.7.6/python-2.7.6.msi)
+> https://www.python.org/ftp/python/2.7.6/python-2.7.6.msi
  
 3 websocket 설치 
 
