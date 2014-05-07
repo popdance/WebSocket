@@ -9,8 +9,14 @@ It is sample project setting websocket server on nodejs.
 
 1 Reference site
 
-nodejs 용 websocket 모듈 : https://www.npmjs.org/package/websocket
-xgate 님의 블로그 : http://cmohgate.tistory.com/10
+- nodejs 용 websocket 모듈 
+ 
+> https://www.npmjs.org/package/websocket
+
+- xgate 님의 블로그
+
+>  http://cmohgate.tistory.com/10
+
 
 2 환경설정
 
