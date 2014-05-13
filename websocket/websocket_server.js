@@ -40,6 +40,12 @@ wsServer.on('request', function(request) {
         if (message.type === 'utf8') {
             console.log('Received Message: ' + message.utf8Data);
             connection.sendUTF(message.utf8Data);
+			var connections = wsServer.connections;
+			for (var index = 0; index < connections.length; index++) {
+				if (connection != connections[index]) {
+					connections[index].sendUTF(message.utf8Data);
+				} 
+			}
         }
         else if (message.type === 'binary') {
             console.log('Received Binary Message of ' + message.binaryData.length + ' bytes');

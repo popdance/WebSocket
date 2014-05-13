@@ -1,7 +1,8 @@
 <!DOCTYPE html>
+<html>
+<head>
 <title>WebSocket Test Page</title>
 <script>
- 
     var log = function(s) {
         console.log(s);
         if (document.readyState !== "complete") {
@@ -12,7 +13,7 @@
     }
     log.buffer = [];
     // 아래 값은 상황에 맞게 변경할 것
-    url = "ws://192.168.0.242:8000";
+    url = "ws://{1}:8000";
     w = new WebSocket(url, 'echo-protocol');
  
     w.onopen = function() {
@@ -37,6 +38,9 @@
         }
     }
 </script>
- 
+</head>
+<body>
 <input type="text" id="inputMessage" value="Hello, Web Socket!"><button id="sendButton">Send</button>
 <pre id="output"></pre>
+</body>
+</html>
