@@ -2,6 +2,14 @@
 <html>
 <head>
 <title>WebSocket Test Page</title>
+<style>
+  #output {
+    width:500px;
+    height:300px;
+    resize:none;
+    overflow-y:auto;
+  }
+</style>
 <script>
     var log = function(s) {
         console.log(s);
@@ -15,32 +23,39 @@
     // 아래 값은 상황에 맞게 변경할 것
     url = "ws://{1}:8000";
     w = new WebSocket(url, 'echo-protocol');
- 
+
     w.onopen = function() {
-        log("open");
+        //log("open");
         w.send("thank you for accepting this Web Socket request");
     }
- 
+
     w.onmessage = function(e) {
-        console.log(e.data);
+        //console.log(e.data);
         log(e.data);
     }
- 
+
     w.onclose = function(e) {
-        log("closed");
+        //log("closed");
     }
- 
+
     window.onload = function() {
-        log(log.buffer.join("\n"));
         document.getElementById("sendButton").onclick = function() {
-            console.log(document.getElementById("inputMessage").value);
             w.send(document.getElementById("inputMessage").value);
+        };
+
+        document.getElementById("inputMessage").onkeydown = function(event) {
+          if(event.keyCode == 13) {
+            w.send(document.getElementById("inputMessage").value);
+            this.value = "";
+          }
         }
     }
 </script>
 </head>
 <body>
-<input type="text" id="inputMessage" value="Hello, Web Socket!"><button id="sendButton">Send</button>
-<pre id="output"></pre>
+<div id="scrollView">
+  <textarea contentEditable="false" id="output"></textarea>
+</div>
+<input type="text" id="inputMessage" placeholder="Input your text..."><button id="sendButton">Send</button>
 </body>
 </html>
