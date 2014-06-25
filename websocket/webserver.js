@@ -1,59 +1,28 @@
 var fs = require("fs");
 var http = require("http");
-var os = require("os");
+var websocket = require("websocket");
+var env = require("./module/environment");
 
-var ServerEnvironment = {
-	address : "128.0.0.1",
-	httpport : 8080,
-	websocketport : 8000,
-	init : function() {
-	   	address = this.getIpAddress();
-
-		console.log("address : " + address);
-
-		// Implement String Object's replaceAll
-		String.prototype.format = function() {
-			var index = 0;
-			var string = (typeof(this) == "function" && !(index++))? arguments[0]:this;
-			for (; index < arguments.length; index++)
-				string = string.replace(/\{\d+?\}/, arguments[index]);
-			return string;
-		}
-	},
-	getIpAddress : function() {
-		// Get My IP Address
-		var interfaces = os.networkInterfaces();
-		for (name in interfaces) {
-			for (ip in interfaces[name]) {
-				var address = interfaces[name][ip];
-				if (address.family == "IPv4" && !address.internal) {
-					return this.address = address.address;
-				}
-			}
-		}
-	}
-}
-
-ServerEnvironment.init();
+env.init();
 
 http.createServer(function(req, res) {
 	fs.readFile('websocket_client.html', function(err, data) {
 		var htmlString = data.toString();
 		res.writeHead(200, {'Content-Type' : 'text/html'});
-		res.end(htmlString.format(ServerEnvironment.address));
+		res.end(htmlString.format(env.getIpAddress()));
 	});
-}).listen(ServerEnvironment.httpport, function() {
-	console.log("Server running (" + ServerEnvironment.address + ":" + ServerEnvironment.httpport + ")");
+}).listen(env.getHttpPort(), function() {
+	console.log("Server running (" + env.getIpAddress() + ":" + env.getHttpPort() +")");
 });
 
-var WebSocketServer = require('websocket').server;
+var WebSocketServer = websocket.server;
 var server = http.createServer(function(request, response) {
     console.log((new Date()) + ' Received request for ' + request.url);
     response.writeHead(404);
     response.end();
 });
-server.listen(ServerEnvironment.websocketport, function() {
-    console.log((new Date()) + ' Server is listening on (' + ServerEnvironment.address + ":" + ServerEnvironment.websocketport + ")");
+server.listen(env.getSockPort(), function() {
+    console.log((new Date()) + ' Server is listening on (' + env.getIpAddress() + ":" + env.getSockPort() + ")");
 });
 
 wsServer = new WebSocketServer({
