@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GDG Korea WebTech - WebRTC Demo</title>
+    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+</head>
+<body>
+
+<table>
+    <tr height="40" align="center">
+        <td>Local</td>
+        <td>Remote</td>
+    </tr>
+    <tr>
+        <td><div id="localDiv"></div></td>
+        <td><div id="remoteDiv"></div></td>
+    </tr>
+    <tr>
+        <td colspan="2" align="center">
+            <div>
+                <input type="text" id="myName" style="width:100px;">
+                <input type="button" id="cmdBtn" style="width:60px;">
+            </div>
+        </td>
+    </tr>
+</table>
+
+
+
+<script type="text/javascript">
+    (function(){
+        var wsSocket;
+        var thisPC;
+        var localStream;
+        var sdp_constraints = {'mandatory': {'OfferToReceiveAudio':true,'OfferToReceiveVideo':true }};
+		
+		var RTCPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
+		var RTCSessionDescription = window.RTCSessionDescription || window.mozRTCSessionDescription || window.webkitRTCSessionDescription;
+		var GET_USER_MEDIA = navigator.getUserMedia ? "getUserMedia" : 
+							 navigator.mozGetUserMedia ? "mozGetUserMedia" :
+					         navigator.webkitGetUserMedia ? "webkitGetUserMedia" : "getUserMedia";
+
+        function init(){
+            openSocket();
+            initBtn();
+        }
+
+        function openSocket(){
+            console.log("init!");
+
+			wsSocket = new WebSocket('ws://{1}', 'echo-protocol');
+            wsSocket.onopen = function(){
+                console.log('socket is opened.');
+                initBtn();
+
+                navigator.webkitGetUserMedia({video:true, audio:true}, function(stream_){
+                    localStream = stream_;
+                    $(createVideo(stream_)).appendTo($('#localDiv'));
+
+                    console.log('local video is attached.');
+                    createPeer();
+                }, function(err_){
+                    console.log('local video is failed.');
+                });
+            };
+            wsSocket.onmessage = function(msg_){
+                parseSignal(JSON.parse(msg_.data));
+            };
+            wsSocket.onclose =  function(e){
+                console.log("Socket is closed.");
+                initBtn();
+            };
+        }
+
+        function createPeer(){
+            var pc_config = {"iceServers": [{"url":'stun:stun1.l.google.com:19302'}]};
+            var pc_constraints = {"optional": [{"DtlsSrtpKeyAgreement": true}]};
+
+            thisPC = new RTCPeerConnection(pc_config, pc_constraints);
+            thisPC.addStream(localStream);
+            thisPC.onicecandidate = function(event) {
+                console.log("PC State["+thisPC.readyState+"] candidate : " + event.candidate);
+                if (event.candidate) {
+                    sendMsg({type: 'candidate',candidate: event.candidate.candidate});
+                }
+            };
+
+            thisPC.oniceconnectionstatechange = function(event){
+                console.log('['+event.target.iceGatheringState+']ICEConnState->'+event.target.iceConnectionState);
+            };
+
+            thisPC.onsignalingstatechange = function(event){
+                console.log('['+event.target.iceGatheringState+']SignalState->'+event.target.signalingState);
+            };
+
+            thisPC.onaddstream = function (event) {
+                console.log("remote stream is added.");
+                $(createVideo(event.stream)).appendTo($('#remoteDiv'));
+            };
+        }
+
+
+        function initBtn(flag_){
+            if((flag_ == undefined && wsSocket) || flag_){
+                switch(wsSocket.readyState){
+                    case WebSocket.CONNECTING:
+                        $('#cmdBtn').val('Not Ready.');
+                        break;
+                    case WebSocket.OPEN:
+                        $('#cmdBtn').val('Connect');
+                            $('#cmdBtn').click(connectToOther);
+                        break;
+                    case WebSocket.CLOSING:
+                    case WebSocket.CLOSED:
+                        $('#cmdBtn').val('Sokcet is Closed.');
+                        break;
+                }
+            }else{
+                $('#cmdBtn').val('Connect');
+            }
+        }
+
+        function parseSignal(msg_){
+            console.log("try to parse the msg->"+msg_);
+            if(msg_.type == 'offer'){
+                console.log("received offer!");
+                thisPC.setRemoteDescription(new RTCSessionDescription(msg_));
+                thisPC.createAnswer(function(sessionDescription){
+                    console.log("send answer.");
+                    thisPC.setLocalDescription(sessionDescription);
+                    sendMsg({sdp: sessionDescription.sdp,type: 'answer'});
+                }, function(error){
+                    console.log(error);
+                }, sdp_constraints);
+
+            }else if(msg_.type == 'answer'){
+                console.log("received answer!");
+                thisPC.setRemoteDescription(new RTCSessionDescription(msg_));
+            }else if(msg_.type == 'candidate'){
+                thisPC.addIceCandidate(new RTCIceCandidate({candidate:msg_.candidate}));
+            }
+        }
+
+        function connectToOther(){
+            thisPC.createOffer(function(sessionDescription){
+                console.log("send offer.");
+                thisPC.setLocalDescription(sessionDescription);
+                sendMsg({sdp: sessionDescription.sdp,type: 'offer'});
+            }, function(error){
+                console.log(error);
+            }, sdp_constraints);
+        }
+
+        function sendMsg(obj_){
+            wsSocket.send(JSON.stringify(obj_));
+        }
+
+        function createVideo(stream_){
+            var video = document.createElement("video");
+            video.autoplay = true;
+            video.src = webkitURL.createObjectURL(stream_);
+            return video;
+        }
+
+        init();
+    })();
+</script>
+</body>
+</html>
