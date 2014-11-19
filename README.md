@@ -37,13 +37,3 @@ It is sample project setting websocket server on nodejs.
 3 websocket 설치 
 
 > npm install websocket
-
-4 source tree 설명 
-- webserver.js // simple web server
-- websocket_client.html	// load page by simpe webserver
-- websocket_client.js	// websocket client exmaple
-- websocket_server.js // websocket server example
-
-
-
-
