@@ -3,17 +3,15 @@ var http = require("http");
 var websocket = require("websocket");
 var env = require("./module/environment");
 
-env.init();
-
 http.createServer(function(req, res) {
 	//fs.readFile('websocket_client.html', function(err, data) {
 	fs.readFile('webrtc_demo.html', function(err, data) {
 		var htmlString = data.toString();
 		res.writeHead(200, {'Content-Type' : 'text/html'});
-		res.end(htmlString.format(env.getIpAddress() + ":" + env.getSockPort()));
+		res.end(htmlString.format(env.getIpAddress() + ":" + env.getWebSocketPort()));
 	});
-}).listen(env.getHttpPort(), function() {
-	console.log("Server running (" + env.getIpAddress() + ":" + env.getHttpPort() +")");
+}).listen(env.getWebServerPort(), function () {
+	console.log("Server running (" + env.getIpAddress() + ":" + env.getWebServerPort() +")");
 });
 
 var WebSocketServer = websocket.server;
@@ -22,8 +20,8 @@ var server = http.createServer(function(request, response) {
     response.writeHead(404);
     response.end();
 });
-server.listen(env.getSockPort(), function() {
-    console.log((new Date()) + ' Server is listening on (' + env.getIpAddress() + ":" + env.getSockPort() + ")");
+server.listen(env.getWebSocketPort(), function () {
+    console.log((new Date()) + ' Server is listening on (' + env.getIpAddress() + ":" + env.getWebSocketPort() + ")");
 });
 
 wsServer = new WebSocketServer({
@@ -51,7 +49,6 @@ wsServer.on('request', function(request) {
 
     var connection = request.accept('echo-protocol', request.origin);
     console.log((new Date()) + ' Connection accepted.');
-
 	connection.on('message', function(message) {
         if (message.type === 'utf8') {
             console.log('Received Message: ' + message.utf8Data);
@@ -65,7 +62,6 @@ wsServer.on('request', function(request) {
 			}
         } else if (message.type === 'binary') {
             console.log('Received Binary Message of ' + message.binaryData.length + ' bytes');
-            
 			connection.sendBytes(message.binaryData);
 			var connections = wsServer.connections;
 			for (var index = 0; index < connections.length; index++) {

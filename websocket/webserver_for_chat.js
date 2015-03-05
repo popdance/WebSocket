@@ -3,16 +3,14 @@ var http = require("http");
 var websocket = require("websocket");
 var env = require("./module/environment");
 
-env.init();
-
 http.createServer(function(req, res) {
-	fs.readFile('websocket_client.html', function(err, data) {
+	fs.readFile('websocket_for_chat.html', function(err, data) {
 		var htmlString = data.toString();
 		res.writeHead(200, {'Content-Type' : 'text/html'});
-		res.end(htmlString.format(env.getIpAddress()));
+		res.end(htmlString.format(env.getIpAddress() + ":" + env.getWebSocketPort()));
 	});
-}).listen(env.getHttpPort(), function() {
-	console.log("Server running (" + env.getIpAddress() + ":" + env.getHttpPort() +")");
+}).listen(env.getWebServerPort(), function () {
+	console.log("Server running (" + env.getIpAddress() + ":" + env.getWebServerPort() +")");
 });
 
 var WebSocketServer = websocket.server;
@@ -21,8 +19,8 @@ var server = http.createServer(function(request, response) {
     response.writeHead(404);
     response.end();
 });
-server.listen(env.getSockPort(), function() {
-    console.log((new Date()) + ' Server is listening on (' + env.getIpAddress() + ":" + env.getSockPort() + ")");
+server.listen(env.getWebSocketPort(), function () {
+    console.log((new Date()) + ' Server is listening on (' + env.getIpAddress() + ":" + env.getWebSocketPort() + ")");
 });
 
 wsServer = new WebSocketServer({

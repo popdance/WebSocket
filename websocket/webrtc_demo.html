@@ -25,10 +25,8 @@
     </tr>
 </table>
 
-
-
 <script type="text/javascript">
-    (function(){
+    (function (){
         var wsSocket;
         var thisPC;
         var localStream;
@@ -49,7 +47,7 @@
             console.log("init!");
 
 			wsSocket = new WebSocket('ws://{1}', 'echo-protocol');
-            wsSocket.onopen = function(){
+            wsSocket.onopen = function (){
                 console.log('socket is opened.');
                 initBtn();
 

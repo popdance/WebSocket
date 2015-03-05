@@ -21,10 +21,10 @@
     }
     log.buffer = [];
     // 아래 값은 상황에 맞게 변경할 것
-    url = "ws://{1}:8000";
+    url = "ws://{1}";
     w = new WebSocket(url, 'echo-protocol');
 
-    w.onopen = function() {
+    w.onopen = function () {
         //log("open");
         w.send("thank you for accepting this Web Socket request");
     }
@@ -38,8 +38,8 @@
         //log("closed");
     }
 
-    window.onload = function() {
-        document.getElementById("sendButton").onclick = function() {
+    window.onload = function () {
+        document.getElementById("sendButton").onclick = function () {
             w.send(document.getElementById("inputMessage").value);
         };
 

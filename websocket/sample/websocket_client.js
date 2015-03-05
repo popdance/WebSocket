@@ -12,7 +12,7 @@ client.on('connect', function(connection) {
     connection.on('error', function(error) {
         console.log("Connection Error: " + error.toString());
     });
-    connection.on('close', function() {
+    connection.on('close', function () {
         console.log('echo-protocol Connection Closed');
     });
     connection.on('message', function(message) {
