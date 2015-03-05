@@ -1,10 +1,10 @@
 var util = require("./server_util");
 
 function Environment() {
-	// private
+    // private
 	var address = "128.0.0.1";
-	var http_port = 8080;
-	var sock_port = 8000;
+	var webserver_port = 8080;
+	var websocket_port = 8000;
 
 	// public
 	this.init = function() {
@@ -16,18 +16,18 @@ function Environment() {
 		return address;
 	};
 
-	this.getHttpPort = function() {
-		return http_port;
+	this.getWebServerPort = function() {
+		return webserver_port;
 	};
 
-	this.getSockPort = function() {
-		return sock_port;
+	this.getWebSocketPort = function() {
+		return websocket_port;
 	};
 }
 
 var env = new Environment();
 
-exports.init = env.init;
-exports.getIpAddress = env.getIpAddress;
-exports.getHttpPort = env.getHttpPort;
-exports.getSockPort = env.getSockPort;
+exports.init            = env.init;
+exports.getIpAddress    = env.getIpAddress;
+exports.getHttpPort     = env.getHttpPort;
+exports.getSockPort     = env.getSockPort;
