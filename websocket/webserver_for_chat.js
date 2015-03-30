@@ -6,7 +6,7 @@ var env = require("./module/environment");
 
 http.createServer(function (req, res) {
     'use strict';
-    fs.readFile('websocket_for_chat.html', function (err, data) {
+    fs.readFile('websocket_demo.html', function (err, data) {
         var htmlString = data.toString();
         res.writeHead(200, {
             'Content-Type': 'text/html'
